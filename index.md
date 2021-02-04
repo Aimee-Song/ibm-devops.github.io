@@ -20,41 +20,39 @@ IBM Cloud Devops 提供了开放的**工具链**以及很多符合各种企业�
 
 - 项目管理和敏捷研发：
 
-  JIRA 项目管理和跟踪
+  **JIRA** 项目管理和跟踪
   
-  GitHub / GotLab / Bitbucket 代码仓库
+  **GitHub / GotLab / Bitbucket** 代码仓库
+    
+  **Slack** 项目协调和协作
   
-  Git 存储库和问题跟踪 IBM 托管且基于 GitLab Community Edition 构建的 Git 存储库和问题跟踪
-  
-  Slack 项目协调和协作
-  
-  Eclipse Orion Web IDE 基于浏览器的IDE
+  **Eclipse Orion Web IDE** 基于浏览器的IDE
   
 
 - 持续交付
 
-  Jenkins 持续集成
+  **Jenkins** 持续集成
   
-  SonarQube 代码质量检查
+  **SonarQube** 代码质量检查
   
-  Sauce Labs 自动执行项目的持续集成测试
+  **Sauce Labs** 自动执行项目的持续集成测试
   
-  Artifactory / Nexus 构建制品存储
+  **Artifactory / Nexus** 构建制品存储
   
 - 持续部署
 
-  Delivery Pipeline 构建和部署
+  **Delivery Pipeline** 构建和部署
   
-  PagerDuty 当 Delivery Pipeline 失败时发送警告
+  **PagerDuty 当 Delivery Pipeline** 失败时发送警告
  
   
 - 安全
 
-  Key Protect / HashiCorp Vault 管理工具链私钥
+  **Key Protect / HashiCorp Vault** 管理工具链私钥
   
 - 监控和度量
 
-  无
+  **无**
   
 ![工具链](./ibm-devops-toolchain-tools.png)
 <center>图：IBM Cloud Devops 工具链工具</center>
