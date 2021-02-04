@@ -1,12 +1,22 @@
-## Welcome to GitHub Pages
+## IBM Devops 实践
 
-You can use the [editor on GitHub](https://github.com/Aimee-Song/ibm-devops.github.io/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+IBM Devops分成两种：
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+[IBM Cloud Devops](https://cloud.ibm.com/devops/getting-started?cm_sp=ibmdev-_-developer-hubs-_-cloudreg)
 
-### Markdown
+[IBM Z Enterprise DevOps](https://www.ibm.com/it-infrastructure/z/capabilities/enterprise-devops)
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+### IBM Cloud Devops
+
+IBM Cloud Devops 提供了开放的**工具链**以及很多符合各种企业需求的**工具链模板**，可自动构建和部署应用程序。提供实现DevOps和DevSecOps方法的各种开源工具，通过创建支持开发，部署和操作任务的简单部署工具链来开始使用。
+
+![工具链模板](./ibm-devops-toolchain-module.png)
+<center>图：IBM Cloud Devops 工具链模板</center>
+
+
+![工具链](./ibm-devops-toolchain-tools.png)
+<center>图：IBM Cloud Devops 工具链工具</center>
+
 
 ```markdown
 Syntax highlighted code block
