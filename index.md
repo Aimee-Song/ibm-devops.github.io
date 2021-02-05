@@ -16,6 +16,9 @@ IBM Cloud Devops 提供了开放的**工具链**以及很多符合各种企业�
 
 工具链提供了一组集成的工具，用于构建、部署和管理应用程序。您可以创建工具链以包含 IBM Cloud 服务、开放式源代码工具和第三方工具，**自由组装**，使开发和操作**可重复**并易于管理。
 
+![工具链](./ibm-devops-toolchain-tools.png)
+<center>图：IBM Cloud Devops 工具链工具</center>
+
 开源工具内容涵盖了 Devops 实践内容：
 
 - 项目管理和敏捷研发：
@@ -27,7 +30,6 @@ IBM Cloud Devops 提供了开放的**工具链**以及很多符合各种企业�
   **Slack** 项目协调和协作
   
   **Eclipse Orion Web IDE** 基于浏览器的IDE
-  
 
 - 持续交付
 
@@ -45,7 +47,6 @@ IBM Cloud Devops 提供了开放的**工具链**以及很多符合各种企业�
   
   **PagerDuty 当 Delivery Pipeline** 失败时发送警告
  
-  
 - 安全
 
   **Key Protect / HashiCorp Vault** 管理工具链私钥
@@ -54,8 +55,12 @@ IBM Cloud Devops 提供了开放的**工具链**以及很多符合各种企业�
 
   **无**
   
-![工具链](./ibm-devops-toolchain-tools.png)
-<center>图：IBM Cloud Devops 工具链工具</center>
+- 其他工具
+ 
+  用户自定义方式集成工具，配置工具图标和工具实例 URL 使用其他工具集成到工具链中
+  
+  
+
 
 
 #### 工具链模板
