@@ -1,5 +1,13 @@
 ## IBM Devops 实践
 
+本章主要是针对 
+
+1.IBM Devops 开源部分使用。
+
+2.IBM Toolkit 实践（Katacode快速构建版本）。
+
+3.Tekton 部署使用实践。
+
 IBM Devops 提供的 Devops 服务分成两种：
 
 基于 IBM Cloud 云服务底座提供的 [IBM Cloud Devops](https://www.ibm.com/cloud/devops)
@@ -11,6 +19,8 @@ IBM Devops 提供的 Devops 服务分成两种：
 IBM Cloud Devops 提供了开放的**工具链**以及很多符合各种企业需求的**工具链模板**，可自动构建和部署应用程序。
 
 提供实现DevOps和DevSecOps方法的各种开源工具，通过创建支持开发，部署和操作任务的简单部署工具链来开始使用。
+
+Delivery Pipeline （交付管道）是 IBM Devops 提供的工具链管理方式，交付包括以最少人工干预的可重复方式构建、测试和部署的交付管道。在管道中，阶段序列检索输入并运行作业，如构建、测试和部署。这里有两种管理方式，经典方式和**Tekton**方式。
 
 #### 工具链
 
@@ -43,7 +53,7 @@ IBM Cloud Devops 提供了开放的**工具链**以及很多符合各种企业�
   
 - 持续部署
 
-  **Delivery Pipeline** 构建和部署
+  **Delivery Pipeline** 构建和部署 （必须，工具链通过 Delivery Pipeline 管理）
   
   **PagerDuty 当 Delivery Pipeline** 失败时发送警告
  
@@ -59,23 +69,30 @@ IBM Cloud Devops 提供了开放的**工具链**以及很多符合各种企业�
  
   用户自定义方式集成工具，配置工具图标和工具实例 URL 使用其他工具集成到工具链中
   
-  
+##### 工具链集成
 
+IBM Devops 工具集成相对简单，针对系统提供的这19种集成工具，可以使用公有部署和私有部署的集成能力，例如使用公有 GitLab 或私有的 GitLab ，而私有的集成方式基本使用 API 方式添加工具服务，并且在 IBM Cloud 中支持安装 CLI 来管理工具。
 
+例如SonarQube工具集成：
+![SonarQube工具集成](./ibm-devops-toolchain-sonarqube.png)
+<center>图：IBM Cloud Devops SonarQube集成</center>
 
 #### 工具链模板
 
+提供快速建立适用于用户场景的工具链。
 
 ![工具链模板](./ibm-devops-toolchain-module.png)
 <center>图：IBM Cloud Devops 工具链模板</center>
 
-
-
 ### 对比 CODING 的优势
 - CODING 提供的是一套相对固定的工具链，只能增减。
   IBM Devops 提出的工具链理念，提供各种开源 Devops 行业流行工具，可以更加灵活搭配使用。
+  并且对外开放工具链添加接口，用户可以随意添加自己生产线上存在的工具。
   
 - IBM Devops 与 IBM Cloud 相对于 CODING 与腾讯云关联性更强。在云服务提供的IaaS，PaaS服务基础上，使其Saas服务能无缝链接。
+  同时也是跟 IBM Cloud 强绑定，如果不使用 IBM 提供的云资源，很多资源非开源，很难开展试用。
+
+
 ```markdown
 Syntax highlighted code block
 
