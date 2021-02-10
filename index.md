@@ -2,103 +2,25 @@
 
 本章主要是针对 
 
-1.IBM Devops 工具链使用。
+1. IBM Toolkit 实践（Katacode快速构建版本）。
 
-2.IBM Toolkit 实践（Katacode快速构建版本）。
+   IBM Toolkit 提供一系列开源 DevOps 工具集合和指引，快速搭建 DevOps 集成环境。
 
-3.Tekton 部署使用实践。
+2. IBM Devops 工具链使用。
+   
+   IBM Toolchain 通过自动化管道提供 Kubernetes 部署使用的应用开发最佳实践。
 
-## 第一部分 IBM Devops 工具链使用
+3. Tekton 部署使用实践。
+   
+   Tekton 是 IBM Continuous Delivery 管道技术的底层，无缝管理工具链中的 CI / CD 工具。
 
-IBM Devops 提供的 Devops 服务分成两种：
+4. 实践中遇到的新概念及问题汇总。
 
-基于 IBM Cloud 云服务底座提供的 [IBM Cloud Devops](https://www.ibm.com/cloud/devops)
-
-混合云环境下的 [IBM Z Enterprise DevOps](https://www.ibm.com/it-infrastructure/z/capabilities/enterprise-devops)
-
-### IBM Cloud Devops
-
-IBM Cloud Devops 提供了开放的**工具链**以及很多符合各种企业需求的**工具链模板**，可自动构建和部署应用程序。
-
-提供实现DevOps和DevSecOps方法的各种开源工具，通过创建支持开发，部署和操作任务的简单部署工具链来开始使用。
-
-Delivery Pipeline （交付管道）是 IBM Devops 提供的工具链管理方式，交付包括以最少人工干预的可重复方式构建、测试和部署的交付管道。在管道中，阶段序列检索输入并运行作业，如构建、测试和部署。这里有两种管理方式，经典方式和**Tekton**方式。
-
-#### 工具链
-
-工具链提供了一组集成的工具，用于构建、部署和管理应用程序。您可以创建工具链以包含 IBM Cloud 服务、开放式源代码工具和第三方工具，**自由组装**，使开发和操作**可重复**并易于管理。
-
-![工具链](./ibm-devops-toolchain-tools.png)
-<center>图：IBM Cloud Devops 工具链工具</center>
-
-开源工具内容涵盖了 Devops 实践内容：
-
-- 项目管理和敏捷研发：
-
-  **JIRA** 项目管理和跟踪
-  
-  **GitHub / GotLab / Bitbucket** 代码仓库
-  
-  **Slack** 项目协调和协作
-  
-  **Eclipse Orion Web IDE** 基于浏览器的IDE
-
-- 持续交付
-
-  **Jenkins** 持续集成
-  
-  **SonarQube** 代码质量检查
-  
-  **Sauce Labs** 自动执行项目的持续集成测试
-  
-  **Artifactory / Nexus** 构建制品存储
-  
-- 持续部署
-
-  **Delivery Pipeline** 构建和部署 （必须，工具链通过 Delivery Pipeline 管理）
-  
-  **PagerDuty 当 Delivery Pipeline** 失败时发送警告
-
-- 安全
-
-  **Key Protect / HashiCorp Vault** 管理工具链私钥
-  
-- 监控和度量
-
-  **无**
-  
-- 其他工具
-
-  用户自定义方式集成工具，配置工具图标和工具实例 URL 使用其他工具集成到工具链中
-  
-##### 工具链集成
-
-IBM Devops 工具集成相对简单，针对系统提供的这19种集成工具，可以使用公有部署和私有部署的集成能力，例如使用公有 GitLab 或私有的 GitLab ，而私有的集成方式基本使用 API 方式添加工具服务，并且在 IBM Cloud 中支持安装 CLI 来管理工具。
-
-例如SonarQube工具集成：
-![SonarQube工具集成](./ibm-devops-toolchain-sonarqube.png)
-<center>图：IBM Cloud Devops SonarQube集成</center>
-
-#### 工具链模板
-
-提供快速建立适用于用户场景的工具链。
-
-![工具链模板](./ibm-devops-toolchain-module.png)
-<center>图：IBM Cloud Devops 工具链模板</center>
-
-### 对比 CODING 的优势
-- CODING 提供的是一套相对固定的工具链，只能增减。
-  IBM Devops 提出的工具链理念，提供各种开源 Devops 行业流行工具，可以更加灵活搭配使用。
-  并且对外开放工具链添加接口，用户可以随意添加自己生产线上存在的工具。
-  
-- IBM Devops 与 IBM Cloud 相对于 CODING 与腾讯云关联性更强。在云服务提供的IaaS，PaaS服务基础上，使其Saas服务能无缝链接。
-  同时也是跟 IBM Cloud 强绑定，如果不使用 IBM 提供的云资源，很多资源非开源，很难开展试用。
-
-## 第二部分 IBM Toolkit 实践
+## 第一部分 IBM Toolkit 实践
 
 IBM Toolkit 是 IBM Devops 提供的 Devops 开源工具的集合，具有以下特性：
 
-**集群**：既托管工具又本身是应用程序构建的部署目标的Red Hat OpenShift或Kubernetes集群。
+**集群**：既托管工具又本身是应用程序构建的部署目标的 Red Hat OpenShift 或 Kubernetes 集群。
 
 **后端服务**：原生云应用程序通常需要的云服务，用于监视，安全性和持久性。
 
@@ -128,9 +50,6 @@ IBM Toolkit 是 IBM Devops 提供的 Devops 开源工具的集合，具有以下
 | 日志监控 | Heapster | 集成EFK日志收集，Prometheus系统监控 |
 | 版本控制 | 暂无 | 内置Git Server（IBM Cloud Devops提供了GitOps能力） |
 | 负载均衡 | Ingress/kube-proxy | OpenShift HAProxy Router |
-
-1.用户权限管理
-OpenShift 和 Kubernetes 都提供针对例如Ldap的接口和众多认证系统对接。但在易用性上，Open'Shift
 
 
 这里使用 [Katacode 试用环境安装](https://learn.openshift.com/playgrounds/openshift45/)，以下所有步骤都在 Katacode 提供的实验环境执行。
@@ -186,25 +105,36 @@ igc --version
 
 
 5. toolkit部署成功后，可以在openshift dashboard后台看到添加的toolkit开源服务。
+
 ![openshift dashboard](./openshift-dashboard-i.png)
 
 点击 Developer Dashboard 跳转至 Toolkit Web UI ，可以看到 OpenShift 为 Toolkit Dashboard 服务授权 RABC 。
+
 ![Toolkit Dashboard RABC](./toolkit-install-ii.png)
 
 Toolkit 工具包中包含
+
 **Swagger Editor**：使用 Swagger 生成项目 API 接口文档。
+
 **ArgoCD**：声明式可视化 GitOps 交付工具，将集群中应用程序的实际状态与Git中定义的所需状态进行比较，并确定它们是否同步。
+
 **Artifactory**：制品存储与管理，提供包括 Maven，Docker，npm，PIP，Helm 的制品管理。
+
 **SonarQube**：静态代码扫描分析工具，提供代码可靠性，安全性质量检查。
+
 **Image Registry**：镜像仓库。
+
 **Pact Broker**：合同测试是一种通过单独检查每个应用程序，以确保其发送或接收的消息符合约定记录的测试技术。
+
 **Developer Dashboard**：导航到集群中安装的 DevOps 工具，提供工具导航，帮助文档，代码仓库模板，工具使用指引，云原生开发部署指引。
 
 访问方式可以通过 OpenShift 提供的导航，Developer Dashboard 以及 OC 命令找到。
+
 ```shell
 ## OC 命令导航到命名空间为 tools 暴露的服务
 oc endpoints -n tools
 ```
+
 ![Toolkit Endpoints](./toolkit-endpoints.png)
 
 ### IBM Toolkit 使用
@@ -212,6 +142,7 @@ oc endpoints -n tools
 IBM Toolkit 提供的开源工具跟IBM 工具链中提供的工具基本一致。
 
 1.使用CLI命令创建新项目myproject，默认会跳转至新创建的项目下。
+
 ```shell
 oc new-project myproject
 ```
@@ -219,12 +150,15 @@ oc new-project myproject
 2.使用toolkit提供的模板项目创建GitHub工程。
 
 Toolkit 为开发人员提供了一系列创建程序的模板项目。
+
 ![Toolkit Template](./toolkit-template.png)
 
 这里使用 Toolkit 提供的 SpringBoot Java Microservice 模板，创建 GitHub 代码仓库。
+
 ![Toolkit Java Demo Template](./toolkit-java-i.png)
 
 3. 使用 GitHub 代码仓库克隆地址，在 DevOps Pipeline 中注册刚刚创建的 Java 微服务项目。
+
 ```shell
 oc pipeline https://github.com/Aimee-Song/toolkit-java.git
 ```
@@ -236,15 +170,18 @@ oc pipeline https://github.com/Aimee-Song/toolkit-java.git
 ![Toolkit Java Jenkins Pipeline](./toolkit-java-ii.png)
 
 CI 任务开始执行后，可以通过 oc 命令查看 myproject 项目资源对象情况。
+
 ```shell
 oc console
 ```
 ![Toolkit Java Result](./toolkit-java-iii.png)
 
 使用 Jenkins 执行的构建任务，同样能使用 oc 命令，查看 SpringBoot 项目构建详情。
+
 ```shell
 oc endpoints
 ```
+
 ![myproject Jenkins Pipeline Result](./toolkit-jenkins-i.png)
 
 打开 OC 命令结果返回链接，跳转 Jenkins 后台查看构建详情。
@@ -288,6 +225,97 @@ Tekton Pipeline 执行结果：
 SpringBoot 微服务部署成功。
 
 ![Toolkit for Java SpringBoot](./toolkit-java-v.png)
+
+## 第二部分 IBM Devops 工具链使用
+
+IBM Devops 提供的 Devops 服务分成两种：
+
+基于 IBM Cloud 云服务底座提供的 [IBM Cloud Devops](https://www.ibm.com/cloud/devops)
+
+混合云环境下的 [IBM Z Enterprise DevOps](https://www.ibm.com/it-infrastructure/z/capabilities/enterprise-devops)
+
+### IBM Cloud Devops
+
+IBM Cloud Devops 提供了开放的**工具链**以及很多符合各种企业需求的**工具链模板**，可自动构建和部署应用程序。
+
+提供实现DevOps和DevSecOps方法的各种开源工具，通过创建支持开发，部署和操作任务的简单部署工具链来开始使用。
+
+Delivery Pipeline （交付管道）是 IBM Devops 提供的工具链管理方式，交付包括以最少人工干预的可重复方式构建、测试和部署的交付管道。在管道中，阶段序列检索输入并运行作业，如构建、测试和部署。这里有两种管理方式，经典方式和**Tekton**方式。
+
+#### 工具链
+
+工具链提供了一组集成的工具，用于构建、部署和管理应用程序。您可以创建工具链以包含 IBM Cloud 服务、开放式源代码工具和第三方工具，**自由组装**，使开发和操作**可重复**并易于管理。
+
+![工具链](./ibm-devops-toolchain-tools.png)
+<center>图：IBM Cloud Devops 工具链工具</center>
+
+开源工具内容涵盖了 Devops 实践内容：
+
+- 项目管理和敏捷研发：
+
+  **JIRA** 项目管理和跟踪
+  
+  **GitHub / GotLab / Bitbucket** 代码仓库
+  
+  **Slack** 项目协调和协作
+  
+  **Eclipse Orion Web IDE** 基于浏览器的IDE
+
+- 持续交付
+
+  **Jenkins** 持续集成
+  
+  **SonarQube** 代码质量检查
+  
+  **Sauce Labs** 自动执行项目的持续集成测试
+  
+  **Artifactory / Nexus** 构建制品存储
+  
+- 持续部署
+
+  **Delivery Pipeline** 构建和部署 （必须，工具链通过 Delivery Pipeline 管理）
+  
+  **PagerDuty** 失败时发送警告
+
+- 安全
+
+  **Key Protect / HashiCorp Vault** 管理工具链私钥
+  
+- 监控和度量
+
+  **无**
+  
+- 其他工具
+
+  用户自定义方式集成工具，配置工具图标和工具实例 URL 使用其他工具集成到工具链中
+  
+##### 工具链集成
+
+IBM Devops 工具集成相对简单，针对系统提供的这19种集成工具，可以使用公有部署和私有部署的集成能力，例如使用公有 GitLab 或私有的 GitLab ，而私有的集成方式基本使用 API 方式添加工具服务，并且在 IBM Cloud 中支持安装 CLI 来管理工具。
+
+例如SonarQube工具集成：
+
+![SonarQube工具集成](./ibm-devops-toolchain-sonarqube.png)
+
+<center>图：IBM Cloud Devops SonarQube集成</center>
+
+#### 工具链模板
+
+提供快速建立适用于用户场景的工具链。
+
+![工具链模板](./ibm-devops-toolchain-module.png)
+
+<center>图：IBM Cloud Devops 工具链模板</center>
+
+### 对比 CODING 的优势
+
+- CODING 提供的是一套相对固定的工具链，只能增减。
+  IBM Devops 提出的工具链理念，提供各种开源 Devops 行业流行工具，可以更加灵活搭配使用。
+  并且对外开放工具链添加接口，用户可以随意添加自己生产线上存在的工具。
+  
+- IBM Devops 与 IBM Cloud 相对于 CODING 与腾讯云关联性更强。在云服务提供的IaaS，PaaS服务基础上，使其Saas服务能无缝链接。
+  同时也是跟 IBM Cloud 强绑定，如果不使用 IBM 提供的云资源，很多资源非开源，很难开展试用。
+  
 
 ## 第三部分 Tekton 安装及实践
 
