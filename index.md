@@ -291,7 +291,9 @@ SpringBoot 微服务部署成功。
 
 ## 第三部分 Tekton 安装及实践
 
-[Tekton](https://tekton.dev/) 是一款功能非常强大而灵活的 CI/CD 开源的云原生框架。Tekton 的前身是 Knative 项目的 build-pipeline 项目，这个项目是为了给 build 模块增加 pipeline 的功能，但是随着不同的功能加入到 Knative build 模块中，build 模块越来越变得像一个通用的 CI/CD 系统，于是，索性将 build-pipeline 剥离出 Knative，就变成了现在的 Tekton，而 Tekton 也从此致力于提供全功能、标准化的云原生 CI/CD 解决方案。
+[Tekton](https://tekton.dev/) 是一款功能非常强大而灵活的 CI/CD 开源的云原生框架。Tekton 的前身是 Knative 项目的 build-pipeline 项目，这个项目是为了给 build 模块增加 pipeline 的功能，但是随着不同的功能加入到 Knative build 模块中，build 模块越来越变得像一个通用的 CI/CD 系统，于是将 build-pipeline 剥离出 Knative，就变成了现在的 Tekton，而 Tekton 也从此致力于提供全功能、标准化的云原生 CI/CD 解决方案。
+
+在第二部分针对 IBM Toolkit 提供的 Tekton 使用中，因为都是基于 Toolkit 模板做的 Tekton 资源对象的创建，对整个 Tekton Pipeline 过程，[IBM Garage](https://github.com/IBM/ibm-garage-tekton-tasks) 提供了一套完整的 DevOps Pipeline 资源对象模板，参照这个模板，在 我们自己的 Kubernetes 集群上搭建一套 Tekton 来实践。
 
 ### Tekton 安装
 
@@ -327,14 +329,14 @@ kubectl apply -f kubectl apply -f https://github.com/Aimee-Song/ibm-devops.githu
 
 ![Tekton Dashboard Install Result](./tekton-dashboard-i.png)
 
-安装完成后，通过svc访问Tekton Web UI。
+安装完成后，通过 svc 访问 Tekton Web UI。
 
 ![Tekton Dashboard](./tekton-dashboard-ii.png)
 
 
 ### Tekton 实践
 
-这里使用简单的 SpringBoot Demo 项目，从 GitHub 仓库获取应用程序代码，测试及部署Demo服务。
+这里使用简单的 SpringBoot Demo 项目，从 GitHub 仓库获取应用程序代码，测试及推送Demo 制品服务。
 
 Tekton 涉及到的资源对象，和  Jenkins 有很多类似的地方，区别是将 Pipeline 对象跟 Kubernetes 资源对象关联。
 
@@ -350,7 +352,236 @@ Tekton 涉及到的资源对象，和  Jenkins 有很多类似的地方，区别
 
 **PipelineResource**：执行 Pipeline 的输入输出资源。
 
+#### SpringBoot Demo 执行测试任务
 
+1. 创建资源文件 task-test.yaml 编写 Task 任务，克隆 SpringBoot Demo 仓库，并进行单元测试。
+
+```yaml
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: test
+spec:
+  resources:
+    inputs:
+    - name: repo
+      type: git
+  steps:
+  - name: run-test
+    image: quay.io/ibmgaragecloud/gradle:jdk11
+    workingDir: /workspace/repo
+    script: |
+        ./gradlew testClasses --no-daemon
+```
+
+```shell
+## 新建资源对象 Task
+kubectl apply -f task-test.yaml
+## 查看创建结果
+kubectl get task
+```
+
+![Tekton Task Test](./tekton-task-test-i.png)
+
+2. 测试任务 task-test 新建完成后，需要创建它的 TaskRun 实例并提供 git repo 的参数才能运行，因此创建资源对象 pipeline-resource.yaml。
+
+```yaml
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: tekton-example
+spec:
+  type: git
+  params:
+  - name: url
+    value: https://github.com/Aimee-Song/toolkit-java
+  - name: revision
+    value: master
+```
+
+```shell
+## 新建资源对象 PipelineResource
+kubectl apply -f pipeline-resource.yaml
+## 查看创建结果
+kubectl get pipelineresource
+```
+
+![Tekton Pipeline resource](./tekton-pipeline-resource-i.png)
+
+3. 然后再创建 TaskRun 实例资源对象 taskrun-test.yaml。其中使用 taskRef 和 resourceRef 属性来关联刚刚创建的 Task 对象和 PipelineResource 对象。
+
+```yaml
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: testrun
+spec:
+  taskRef:
+    name: test
+  resources:
+    inputs:
+    - name: repo
+      resourceRef:
+        name: tekton-example
+```
+
+```shell
+## 新建资源对象 TaskRun
+kubectl apply -f taskrun-test.yaml
+## 查看创建结果
+kubectl get taskrun
+```
+
+![Tekton TaskRun](./tekton-taskrun-i.png)
+
+执行完成后，通过命令查询 TaskRun pod 运行结果。
+
+![Tekton TaskRun Result](./tekton-taskrun-ii.png)
+
+登录 Tekton Dashboard 查看测试任务执行成功。
+
+![Tekton TaskRun Result](./tekton-taskrun-iii.png)
+
+#### 将 Demo 打成制品包上传至 Docker Hub
+
+1. 先创建 secret.yaml 的 Secret 凭证资源对象，方便 Tekton 任务上传镜像包到 Docker Hub 镜像仓库。
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: docker-auth
+    tekton.dev/docker-0: https://index.docker.io/v1/
+type: kubernetes.io/basic-auth
+stringData:
+  username: aimeesong   ## 这里填上 Docker Hub 密码
+  password: xxxx  ## 这里填上 Docker Hub 密码
+```
+
+然后创建一个 servceaccount.yaml 的 ServiceAccount 资源对象来引用刚刚创建的 Secret。
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: build-sa
+secrets:
+- name: docker-auth
+```
+
+创建后查询执行结果：
+
+![Tekton Docker Hub Secret](./tekton-dockerhub-secret-i.png)
+
+2. 最后创建名为 task-build-push.yaml 的 Task 任务来构建并推送 Docker 制品至 Docker Hub 仓库。
+
+```yaml
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: build-and-push
+spec:
+  resources:
+    inputs:
+    - name: repo
+      type: git
+  steps:
+  - name: build-and-push
+  ## 使用 Kaniko 工具构建，无需依赖 Docker 守护进程
+    image: cnych/kaniko-executor:v0.22.0
+    env:
+    - name: DOCKER_CONFIG
+      value: /tekton/home/.docker
+    command:
+    ## executor 命令包含了 build 并 push
+    - /kaniko/executor
+    - --dockerfile=Dockerfile
+    - --context=/workspace/repo
+    - --destination=aimeesong/tekton-test:v1
+```
+
+3. 构建并打包的 Task 任务创建好后，只需要创建一个 taskrun-build-push.yaml 的 TaskRun 资源对象实例并通过 serviceAccountName 关联第一步创建的 ServiceAccount 来运行任务，resourceRef 用来关联在测试阶段生成的 PipelineResource 对象。
+
+```yaml
+apiVersion: tekton.dev/v1betav1
+kind: TaskRun
+metadata:
+  name: build-and-push
+spec:
+  serviceAccountName: build-sa
+  taskRef:
+    name: build-and-push
+  resources:
+    inputs:
+    - name: repo
+      resourceRef:
+        name: tekton-example
+```
+
+Task 执行过程分为两步，构建与推送，构建正常，因本次推送至 Docker Hub 网关报错，所以构建失败。
+
+![Tekton Pipeline Result](./tekton-pipeline-result-ii.png)
+
+#### 创建 Tekton Pipeline
+
+接下来就是将刚刚测试和推送制品的 Task 任务串联成一个完整的流水线。
+
+1. 创建一个 pipeline.yaml 的 Pipeline资源对象，使用 runAfter 标志 Task 执行顺序。
+
+```yaml
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: test-build-push
+spec:
+  resources:
+  - name: repo
+    type: git
+  tasks:
+  ## 测试任务
+  - name: test
+    taskRef:
+      name: test
+    resources:
+      inputs:
+      - name: repo
+        resource: repo
+  ## 构建并对象镜像
+  - name: build-and-push
+    taskRef:
+      name: build-and-push
+    runAfter:
+    - test
+    resources:
+      inputs:
+      - name: repo
+        resource: repo
+```
+
+2. 和 TaskRun 一样，创建 pipelinerun.yaml 文件来管理 PipelineRun 对象，引用 ServiceAccount 和 仓库资源，作为 Pipeline 对象的实例。
+
+```yaml
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: test-build-push-run
+spec:
+  serviceAccountName: build-sa
+  pipelineRef:
+    name: test-build-push
+  resources:
+  - name: repo
+    resourceRef:
+      name: tekton-example
+```
+
+执行 PipelineRun 资源清单后，在 Tekton Dashboard 中查看资源进度。
+
+![Tekton PipelineRun](./tekton-pipelinerun-i.png)
+
+### 总结
+
+Tekton 区别于 Jenkins，使用配置和流程分离的 Task / TaskRun / Pipeline / PipelineRun 结构，更易于维护，较 Jenkins 更轻量级，Task 复用性更强。
 
 ## 第四部分 实践中遇到的新概念及问题汇总
 
@@ -361,6 +592,7 @@ Tekton 涉及到的资源对象，和  Jenkins 有很多类似的地方，区别
 2. **GitOps** 是 DevOps 衍生的一种持续交付方式，它的核心思想是将应用系统的声明性基础架构和应用程序存放在Git版本库中。在 IBM Toolkit 中使用 ArgoCD 声明 GitOps 交付流程。
 
 3. **Pact Broker**契约测试是在微服务大背景下越来越多团队关注的服务之间的交互的数据接口测试，主要针对一个服务生产者面对多个消费者场景，又称消费者驱动测试。对比功能测试，有以下区别：
+
 |  | 功能测试 | 契约测试 |
 | :---: | :---:| :---:|
 | 测试内容 | 服务端实现 | 服务端改变是否影响每一个消费者 |
@@ -369,7 +601,9 @@ Tekton 涉及到的资源对象，和  Jenkins 有很多类似的地方，区别
 
 
 ### 问题汇总
+
 1. EACCES: Permission denied  问题，在执行 toolkit-cli 安装过程中，因为 IAM 分配权限不足，无权下载。
+
 ```shell
 ## 问题现象
 songyue@cloudshell:~$ npm install -g @ibmgaragecloud/cloud-native-toolkit-cli
@@ -403,6 +637,7 @@ npm ERR!     /home/songyue/.npm/_logs/2021-02-09T16_16_07_434Z-debug.log
 ```
 
 2. Toolkit 关联 GitHub Webhook 失败，导致无法自动触发 Pipeline 任务。
+
 ```shell
 ## 错误现象
 songyue@cloudshell:~$ oc pipeline https://github.com/Aimee-Song/toolkit-java.git
@@ -420,4 +655,26 @@ Adding privileged scc to jenkins serviceAccount
 Registering pipeline: Aimee-Song.toolkit-java
 Creating git webhook
 Warning: Error creating webhook. The webhook can be manually created by sending push events to https://jenkins-myproject.mycluster-tok02-b-149565-21104e6c3808a10d7314ab7c849c7381-0000.jp-tok.containers.appdomain.cloud
+```
+
+3. TaskRun 制品推送过程中报错。
+
+```shell
+## 报错现象
+Complete!
+INFO[0557] Taking snapshot of full filesystem...        
+INFO[0558] Resolving 20083 paths                        
+INFO[0569] COPY --from=builder /home/gradle/build/libs/server.jar ./server.jar 
+INFO[0569] Resolving 1 paths                            
+INFO[0569] Taking snapshot of files...                  
+INFO[0570] EXPOSE 9080/tcp                              
+INFO[0570] cmd: EXPOSE                                  
+INFO[0570] Adding exposed port: 9080/tcp                
+INFO[0570] CMD ["java", "-jar", "./server.jar"]         
+error pushing image: failed to push to destination aimeesong/tekton-test:v1: PATCH https://index.docker.io/v2/aimeesong/tekton-test/blobs/uploads/26c27649-9bfa-4f2f-b1cf-f39cbc0b1239?_state=REDACTED: unsupported status code 504; body: <html><body><h1>504 Gateway Time-out</h1>
+The server didn't respond in time.
+</body></html>
+
+## 报错原因
+需要先在 Docker Hub 创建 aimeesong/tekton-test 资源，才能够推送
 ```
